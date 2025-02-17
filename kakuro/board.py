@@ -1,5 +1,7 @@
-from kakuro.node import Node
+from typing import Tuple
+
 from kakuro.config import Config
+from kakuro.node import Node
 
 
 class Board:
@@ -10,7 +12,7 @@ class Board:
         board (list): The board representation as a 2D list of Node objects.
     """
 
-    def __init__(self, board) -> None:
+    def __init__(self, board: "Board") -> None:
         self.board = board
 
     @property
@@ -66,7 +68,7 @@ class Board:
 
     def remove_non_intersection(
         self, x: int, y: int, node1: Node, node2: Node
-    ) -> (Node, Node):
+    ) -> Tuple[Node, Node]:
         """
         Remove non-intersecting combinations from the given nodes.
 
