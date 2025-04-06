@@ -7,6 +7,7 @@ import itertools
 import pprint
 import copy
 import random
+from functools import reduce
 
 __all__ = ["solver", "generator"]
 
@@ -282,7 +283,7 @@ class Board:
                     continue
                 elif type(self.b[i][j]) == list:
                     if self.b[i][j][0] == set([]):
-                        print i, j, "This kakuro is intrinsically unsolvable."
+                        print(i, j, "This kakuro is intrinsically unsolvable.")
                     elif len(self.b[i][j][0]) == 1:
                         self.updateValues(i, j)
         self.getValueSets()
@@ -320,11 +321,11 @@ class Board:
         del workcopy
         
         if self.solved():
-            print "This kakuro is solved. The unique solution is:"
+            print("This kakuro is solved. The unique solution is:")
             self.printBoard()
             return True
         else:
-            print "This kakuro is logically unsolvable. It may or may not have multiple solutions."
+            print("This kakuro is logically unsolvable. It may or may not have multiple solutions.")
             return False
         
     @staticmethod
@@ -368,7 +369,7 @@ class Board:
         if len(run1[1]) < len(run2[1]):
             run1, run2 = run2, run1
             
-        print "Random start runs: ", run1, run2
+        print("Random start runs: ", run1, run2)
         
         b[1][1] = (set(run1[1]) & set(run2[1])).pop()
         b[0][1]['B'] = (run1[0], len(run1[1]), set())
@@ -464,7 +465,7 @@ class Board:
                                     b[i][j] = {'B':-1, 'R':0}
                                     bobj.getClue(i,j)
                                 elif len(lvalues) <= 1:
-                                    value = random.sample(allowedValues - tvalues - lvalues, 1)[0]
+                                    value = random.sample(list(allowedValues - tvalues - lvalues), 1)[0]
                                     tvalues.add(value)
                                     lvalues.add(value)
                                     b[tx][j]['B'] = (sum(tvalues), len(tvalues), tvalues)
@@ -484,13 +485,15 @@ class Board:
                                      b[i][ly]['R'] = (sum(lvalues), len(lvalues), lvalues)
                                      b[i][j] = {'B':getRandomClue(br - 1 - j), 'R':-1}
                                 else:
-                                     v = (allowedValues - tvalues - lvalues).pop()
-                                     tvalues.add(v)
-                                     lvalues.add(v)
-                                     tclue = tclue if tclue > v + sum(tvalues) else getRandomClueBySquaresValues(tsquares, tvalues)
-                                     b[tx][j]['B'] = (tclue, tsquares, tvalues)
-                                     b[i][ly]['R'] = (sum(lvalues), len(lvalues), lvalues)
-                                     b[i][j] = v
+                                     values = list(allowedValues - tvalues - lvalues)
+                                     if len(values) > 0:
+                                      v = values.pop()
+                                      tvalues.add(v)
+                                      lvalues.add(v)
+                                      tclue = tclue if tclue > v + sum(tvalues) else getRandomClueBySquaresValues(tsquares, tvalues)
+                                      b[tx][j]['B'] = (tclue, tsquares, tvalues)
+                                      b[i][ly]['R'] = (sum(lvalues), len(lvalues), lvalues)
+                                      b[i][j] = v
                             elif i == br - 2 and j == bc - 1:
                                 b[i][j] = -1
                                 b[tx][j]['B'] = (sum(tvalues), len(tvalues), tvalues)
@@ -592,10 +595,10 @@ def testgenerator():
     while 1:
         b = Board.generator(boardRow, boardCol)
         
-        print 'Clues: %s' % b.clues
+        print('Clues: %s' % b.clues)
         #b.printBoard()
 
-        print 'Verifying result...'
+        print('Verifying result...')
         bverify = b.getStartBoard()
         if bverify.solver():
             break      
